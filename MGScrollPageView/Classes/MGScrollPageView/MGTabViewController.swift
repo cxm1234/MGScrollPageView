@@ -12,11 +12,11 @@ import SnapKit
 fileprivate let KScreenWidth = UIScreen.main.bounds.width
 fileprivate let KScreenHeight = UIScreen.main.bounds.height
 
-fileprivate let NavBarHeight:CGFloat = (UIScreen.main.bounds.height == 812) ? 88:64
+fileprivate let NavBarHeight:CGFloat = (UIScreen.main.bounds.height == 812 || UIScreen.main.bounds.height == 896) ? 88:64
 
 // MARK:外部使用方法
 extension MGTabViewController{
-     public func reloadView(){
+    public func reloadView(){
         tableView.delegate = self
         tableView.dataSource = self
         if headView == nil || headView?.frame.size.height == 0  {
@@ -28,7 +28,7 @@ extension MGTabViewController{
         }
         tableView.tableHeaderView = headView
         tableView.reloadData()
-//        contentView.reload()
+        //        contentView.reload()
         segmentView.reloadTitles(withNewTitles: titles)
     }
     
@@ -392,7 +392,8 @@ extension MGTabViewController:PageViewDelegate
         }
         else
         {
-            self.tableView.contentOffset.y = height
+            //            self.tableView.contentOffset.y = height
+            tableView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: ceil(height))
             scrollView.showsVerticalScrollIndicator = true
             changeNavBar(scrollView: scrollView)
         }
@@ -409,14 +410,16 @@ extension MGTabViewController:UIScrollViewDelegate
         var height = hotHeight()
         if let pageViewController = currentSubViewController, let childScrollView = pageViewController.scrollView{
             if childScrollView.contentOffset.y > 0 {
-                tableView.contentOffset.y = height
+                //                tableView.contentOffset.y = height
+                tableView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: ceil(height))
             }
             if scrollView.contentOffset.y  < height {
                 childScrollView.contentOffset = CGPoint.zero
             }
             else
             {
-                tableView.contentOffset.y = height
+                //                tableView.contentOffset.y = height
+                tableView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: ceil(height))
             }
             if autoContentSize {
                 if scrollView.contentOffset.y  < height {
@@ -430,7 +433,8 @@ extension MGTabViewController:UIScrollViewDelegate
             if childScrollView.contentSize.height <= childScrollView.bounds.height {
                 if tableView.contentOffset.y >= height
                 {
-                    self.tableView.contentOffset.y = height
+                    //                    self.tableView.contentOffset.y = height
+                    tableView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: ceil(height))
                     changeNavBar(scrollView: scrollView)
                 }
                 else
