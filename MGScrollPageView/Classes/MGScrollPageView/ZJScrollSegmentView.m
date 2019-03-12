@@ -14,7 +14,7 @@
     CGFloat _currentWidth;
     NSUInteger _currentIndex;
     NSUInteger _oldIndex;
-//    BOOL _isScroll;
+    //    BOOL _isScroll;
 }
 // 滚动条
 @property (strong, nonatomic) UIView *scrollLine;
@@ -74,7 +74,7 @@ static CGFloat const contentSizeXOff = 20.0;
         // 设置了frame之后可以直接设置其他的控件的frame了, 不需要在layoutsubView()里面设置
         [self setupSubviews];
         [self setupUI];
-
+        
     }
     
     return self;
@@ -154,7 +154,7 @@ static CGFloat const contentSizeXOff = 20.0;
         titleView.text = title;
         titleView.textColor = self.segmentStyle.normalTitleColor;
         titleView.imagePosition = self.segmentStyle.imagePosition;
-
+        
         
         if (self.delegate && [self.delegate respondsToSelector:@selector(setUpTitleView:forIndex:)]) {
             [self.delegate setUpTitleView:titleView forIndex:index];
@@ -177,7 +177,7 @@ static CGFloat const contentSizeXOff = 20.0;
 
 - (void)setupUI {
     if (self.titles.count == 0) return;
-
+    
     [self setupScrollViewAndExtraBtn];
     [self setUpTitleViewsPosition];
     [self setupScrollLineAndCover];
@@ -244,13 +244,13 @@ static CGFloat const contentSizeXOff = 20.0;
             
             addedMargin = allTitlesWidth < self.scrollView.bounds.size.width ? (self.scrollView.bounds.size.width - allTitlesWidth)/self.titleWidths.count : 0 ;
         }
-
+        
         for (ZJTitleView *titleView in self.titleViews) {
             titleW = [self.titleWidths[index] floatValue];
             titleX = lastLableMaxX + addedMargin/2;
-
+            
             lastLableMaxX += (titleW + addedMargin + self.segmentStyle.titleMargin);
-
+            
             titleView.frame = CGRectMake(titleX, titleY, titleW, titleH);
             if (self.segmentStyle.isShowImage) {
                 [titleView adjustSubviewFrame];
@@ -260,14 +260,25 @@ static CGFloat const contentSizeXOff = 20.0;
         }
         
     }
-    
+    //
     ZJTitleView *currentTitleView = (ZJTitleView *)self.titleViews[_currentIndex];
     currentTitleView.currentTransformSx = 1.0;
     if (currentTitleView) {
-        
         // 缩放, 设置初始的label的transform
         if (self.segmentStyle.isScaleTitle) {
-            currentTitleView.currentTransformSx = self.segmentStyle.titleBigScale;
+            for (int i = 0; i < self.titleViews.count; i++) {
+                if (i != _currentIndex) {
+                    ZJTitleView *titleView = (ZJTitleView *)self.titleViews[i];
+                    titleView.currentTransformSx = self.segmentStyle.titleBigScale;
+                }
+            }
+            
+            //            for (ZJTitleView * titleView in self.titleViews) {
+            //                if (titleView != currentTitleView) {
+            //                    titleView.currentTransformSx = self.segmentStyle.titleBigScale;
+            //                }
+            //            }
+            //            currentTitleView.currentTransformSx = self.segmentStyle.titleBigScale;
         }
         // 设置初始状态文字的颜色
         currentTitleView.textColor = self.segmentStyle.selectedTitleColor;
@@ -289,12 +300,14 @@ static CGFloat const contentSizeXOff = 20.0;
     if (self.scrollLine) {
         if (self.segmentStyle.isScrollTitle) {
             self.scrollLine.frame = CGRectMake(coverX , self.zj_height - self.segmentStyle.scrollLineHeight, coverW , self.segmentStyle.scrollLineHeight);
+            self.scrollLine.layer.cornerRadius = self.segmentStyle.scrollLineCornerRadius;
+            //            self.scrollLine.clipsToBounds
         } else {
             if (self.segmentStyle.isAdjustCoverOrLineWidth) {
                 coverW = [self.titleWidths[_currentIndex] floatValue] + wGap;
                 coverX = (firstLabel.zj_width - coverW) * 0.5;
             }
-
+            
             self.scrollLine.frame = CGRectMake(coverX , self.zj_height - self.segmentStyle.scrollLineHeight, coverW , self.segmentStyle.scrollLineHeight);
         }
         CGFloat width = (_currentIndex == 0 && _titles.count > 0 )? self.scrollLine.zj_width + self.segmentStyle.titleMargin*3/2:self.scrollLine.zj_width + self.segmentStyle.titleMargin ;
@@ -323,14 +336,14 @@ static CGFloat const contentSizeXOff = 20.0;
                 coverW = [self.titleWidths[_currentIndex] floatValue] + wGap;
                 coverX = (firstLabel.zj_width - coverW) * 0.5;
             }
-
+            
             self.coverLayer.frame = CGRectMake(coverX, coverY, coverW, coverH);
             
         }
         
         
     }
-        
+    
 }
 
 
@@ -352,8 +365,8 @@ static CGFloat const contentSizeXOff = 20.0;
         oldTitleView.selected = NO;
         currentTitleView.selected = YES;
         if (weakSelf.segmentStyle.isScaleTitle) {
-            oldTitleView.currentTransformSx = 1.0;
-            currentTitleView.currentTransformSx = weakSelf.segmentStyle.titleBigScale;
+            oldTitleView.currentTransformSx = weakSelf.segmentStyle.titleBigScale;
+            currentTitleView.currentTransformSx = 1.0;
         }
         
         if (weakSelf.scrollLine) {
@@ -402,10 +415,10 @@ static CGFloat const contentSizeXOff = 20.0;
             }
             
         }
-
+        
     } completion:^(BOOL finished) {
         [weakSelf adjustTitleOffSetToCurrentIndex:_currentIndex];
-
+        
     }];
     
     _oldIndex = _currentIndex;
@@ -426,7 +439,7 @@ static CGFloat const contentSizeXOff = 20.0;
     
     ZJTitleView *oldTitleView = (ZJTitleView *)self.titleViews[oldIndex];
     ZJTitleView *currentTitleView = (ZJTitleView *)self.titleViews[currentIndex];
-
+    
     
     CGFloat xDistance = currentTitleView.zj_x - oldTitleView.zj_x;
     CGFloat wDistance = currentTitleView.zj_width - oldTitleView.zj_width;
@@ -487,7 +500,7 @@ static CGFloat const contentSizeXOff = 20.0;
     
     // 渐变
     if (self.segmentStyle.isGradualChangeTitleColor) {
-
+        
         oldTitleView.textColor = [UIColor colorWithRed:[self.selectedColorRgb[0] floatValue] + [self.deltaRGB[0] floatValue] * progress green:[self.selectedColorRgb[1] floatValue] + [self.deltaRGB[1] floatValue] * progress blue:[self.selectedColorRgb[2] floatValue] + [self.deltaRGB[2] floatValue] * progress alpha:1.0];
         currentTitleView.textColor = [UIColor colorWithRed:[self.normalColorRgb[0] floatValue] - [self.deltaRGB[0] floatValue] * progress green:[self.normalColorRgb[1] floatValue] - [self.deltaRGB[1] floatValue] * progress blue:[self.normalColorRgb[2] floatValue] - [self.deltaRGB[2] floatValue] * progress alpha:1.0];
         
@@ -497,10 +510,9 @@ static CGFloat const contentSizeXOff = 20.0;
         return;
     }
     
-    CGFloat deltaScale = self.segmentStyle.titleBigScale - 1.0;
-    oldTitleView.currentTransformSx = self.segmentStyle.titleBigScale - deltaScale * progress;
-    currentTitleView.currentTransformSx = 1.0 + deltaScale * progress;
-    
+    CGFloat deltaScale = 1.0 - self.segmentStyle.titleBigScale;
+    oldTitleView.currentTransformSx = 1.0 - deltaScale * progress;
+    currentTitleView.currentTransformSx = self.segmentStyle.titleBigScale + deltaScale * progress;
     
 }
 
@@ -511,28 +523,28 @@ static CGFloat const contentSizeXOff = 20.0;
             ZJTitleView *nextTitleView = _titleViews[index];
             if (index != currentIndex) {
                 nextTitleView.textColor = self.segmentStyle.normalTitleColor;
-                nextTitleView.currentTransformSx = 1.0;
+                nextTitleView.currentTransformSx = self.segmentStyle.titleBigScale;
                 nextTitleView.selected = NO;
             }
             else {
                 nextTitleView.textColor = self.segmentStyle.selectedTitleColor;
                 if (self.segmentStyle.isScaleTitle) {
-                    nextTitleView.currentTransformSx = self.segmentStyle.titleBigScale;
+                    nextTitleView.currentTransformSx = 1.0;
                 }
                 nextTitleView.selected = YES;
             }
-
+            
         }
     }
-  
-
+    
+    
     if (self.scrollView.contentSize.width != self.scrollView.bounds.size.width + contentSizeXOff) {// 需要滚动
         ZJTitleView *currentTitleView = (ZJTitleView *)_titleViews[currentIndex];
-
+        
         CGFloat offSetx = currentTitleView.center.x - _currentWidth * 0.5;
         if (offSetx < 0) {
             offSetx = 0;
-
+            
         }
         CGFloat extraBtnW = self.extraBtn ? self.extraBtn.zj_width : 0.0;
         CGFloat maxOffSetX = self.scrollView.contentSize.width - (_currentWidth - extraBtnW);
@@ -550,16 +562,16 @@ static CGFloat const contentSizeXOff = 20.0;
             for (ZJTitleView *titleView in _titleViews) {
                 if (index != currentIndex) {
                     titleView.textColor = self.segmentStyle.normalTitleColor;
-                    titleView.currentTransformSx = 1.0;
+                    titleView.currentTransformSx = self.segmentStyle.titleBigScale;
                     titleView.selected = NO;
                 }
                 else {
                     titleView.textColor = self.segmentStyle.selectedTitleColor;
                     if (self.segmentStyle.isScaleTitle) {
-                        titleView.currentTransformSx = self.segmentStyle.titleBigScale;
+                        titleView.currentTransformSx = 1.0;
                     }
                     titleView.selected = YES;
- 
+                    
                 }
                 
                 index++;
@@ -567,13 +579,13 @@ static CGFloat const contentSizeXOff = 20.0;
         }
         [self.scrollView setContentOffset:CGPointMake(offSetx, 0.0) animated:YES];
     }
-
- 
+    
+    
 }
 
 - (void)setSelectedIndex:(NSInteger)index animated:(BOOL)animated {
     NSAssert(index >= 0 && index < self.titles.count, @"设置的下标不合法!!");
-
+    
     if (index < 0 || index >= self.titles.count) {
         return;
     }
@@ -610,7 +622,7 @@ static CGFloat const contentSizeXOff = 20.0;
     if (!_scrollLine) {
         UIView *lineView = [[UIView alloc] init];
         lineView.backgroundColor = self.segmentStyle.scrollLineColor;
-
+        
         _scrollLine = lineView;
     }
     
@@ -644,7 +656,7 @@ static CGFloat const contentSizeXOff = 20.0;
         coverView.backgroundColor = self.segmentStyle.coverBackgroundColor;
         coverView.layer.cornerRadius = self.segmentStyle.coverCornerRadius;
         coverView.layer.masksToBounds = YES;
-
+        
         _coverLayer = coverView;
         
     }
@@ -693,7 +705,7 @@ static CGFloat const contentSizeXOff = 20.0;
         UIImageView *imageView = [[UIImageView alloc] initWithFrame:self.bounds];
         
         [self insertSubview:imageView atIndex:0];
-
+        
         _backgroundImageView = imageView;
     }
     return _backgroundImageView;
@@ -734,7 +746,7 @@ static CGFloat const contentSizeXOff = 20.0;
             CGFloat deltaB = [normalColorRgb[2] floatValue] - [selectedColorRgb[2] floatValue];
             delta = [NSArray arrayWithObjects:@(deltaR), @(deltaG), @(deltaB), nil];
             _deltaRGB = delta;
-
+            
         }
     }
     return _deltaRGB;

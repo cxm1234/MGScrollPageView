@@ -28,6 +28,7 @@
         _extraBtnBackgroundImageName = nil;
         _scrollLineHeight = 2.0;
         _scrollLineColor = [UIColor brownColor];
+        _scrollLineCornerRadius = 0.0;
         _coverBackgroundColor = [UIColor lightGrayColor];
         _coverCornerRadius = 14.0;
         _coverHeight = 28.0;

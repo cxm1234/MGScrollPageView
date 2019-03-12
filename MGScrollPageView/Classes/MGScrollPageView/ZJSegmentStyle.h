@@ -68,6 +68,8 @@ typedef NS_OPTIONS(NSInteger, SegmentViewComponent) {
 @property (assign, nonatomic) CGFloat scrollLineHeight;
 /** 滚动条的颜色 */
 @property (strong, nonatomic) UIColor *scrollLineColor;
+/** 滚动条的圆角 */
+@property (assign, nonatomic) CGFloat scrollLineCornerRadius;
 /** 遮盖的颜色 */
 @property (strong, nonatomic) UIColor *coverBackgroundColor;
 /** 遮盖的圆角 默认为14*/
